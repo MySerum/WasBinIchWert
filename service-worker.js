@@ -1,0 +1,6 @@
+const CACHE='wasbinichwert-pages-v82';
+const LOCAL=['./','./index.html','./styles.css','./app.js','./manifest.webmanifest','./icon.svg'];
+const PAP='https://cdn.jsdelivr.net/npm/lohnsteuerrechner/+esm';
+self.addEventListener('install',e=>e.waitUntil((async()=>{const c=await caches.open(CACHE);await c.addAll(LOCAL);try{const r=await fetch(PAP,{mode:'cors'});if(r.ok)await c.put(PAP,r.clone())}catch{}self.skipWaiting()})()));
+self.addEventListener('activate',e=>e.waitUntil((async()=>{for(const k of await caches.keys())if(k!==CACHE)await caches.delete(k);await self.clients.claim()})()));
+self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;const u=e.request.url;if(u===PAP){e.respondWith((async()=>{const c=await caches.match(PAP);if(c)return c;const r=await fetch(e.request);if(r.ok)(await caches.open(CACHE)).put(PAP,r.clone());return r})());return}if(new URL(u).origin===self.location.origin)e.respondWith(caches.match(e.request).then(c=>c||fetch(e.request).then(r=>{if(r.ok)caches.open(CACHE).then(x=>x.put(e.request,r.clone()));return r}).catch(()=>caches.match('./index.html'))))});
