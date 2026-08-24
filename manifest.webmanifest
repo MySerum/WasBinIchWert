@@ -1,0 +1,12 @@
+{
+  "name": "WasBinIchWert",
+  "short_name": "WasBinIchWert",
+  "description": "Netto-Stundenwert, Jobvergleich, Wunschgehalt und effektiver Jobwert.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0b1f4d",
+  "lang": "de-DE",
+  "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+}
