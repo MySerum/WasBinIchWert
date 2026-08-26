@@ -85,6 +85,38 @@ function calcPayroll(g){
 }
 function calcNet(g){ return calcPayroll(g).net; }
 
+function calcSpecialPayment(g,specialGross){
+ const special=Math.max(0,+specialGross||0);
+ if(!special)return {gross:0,tax:0,soli:0,church:0,rv:0,av:0,kv:0,pv:0,net:0};
+ const inputs={...papInputs(g),SONSTB:Math.round(special*100),JRE4:Math.round(g*12*100)};
+ const pap=calculateLohnsteuer(2026,inputs);
+ const tax=(pap.STS||0)/100;
+ const soli=(pap.SOLZS||0)/100;
+ const churchBase=(pap.BKS||0)/100;
+ const churchRate=($('state').value==='Bayern'||$('state').value==='Baden-Württemberg')?.08:.09;
+ const church=$('church').value==='yes'?churchBase*churchRate:0;
+ const regularAnnual=g*12;
+ const bbRVAnnual=8450*12;
+ const bbKVAnnual=5812.50*12;
+ const rvBase=$('rvInsured').value==='yes'?Math.min(special,Math.max(0,bbRVAnnual-regularAnnual)):0;
+ const avBase=$('avInsured').value==='yes'?Math.min(special,Math.max(0,bbRVAnnual-regularAnnual)):0;
+ let kvBase=0,pvBase=0;
+ if($('healthType').value==='gkv'){
+   kvBase=Math.min(special,Math.max(0,bbKVAnnual-regularAnnual));
+   pvBase=kvBase;
+ }
+ const addon=Math.max(0,+$('addon').value||0)/100;
+ const rv=rvBase*.093;
+ const av=avBase*.013;
+ const kv=kvBase*(.073+addon/2);
+ const kids=+$('children').value;
+ let pvRate=$('state').value==='Sachsen'?(kids===0?.029:.023):(kids===0?.024:.018);
+ if(kids>=2)pvRate-=Math.min(kids-1,4)*.0025;
+ const pv=pvBase*Math.max(.008,pvRate);
+ const net=Math.max(0,special-tax-soli-church-rv-av-kv-pv);
+ return {gross:special,tax,soli,church,rv,av,kv,pv,net,pap};
+}
+
 let mode='m', aMode='m', bMode='m';
 function monthGross(){return mode==='m'?+$('salary').value:+$('salary').value/12}
 function compareGross(id,modeVal){const v=+$(id).value||0; return modeVal==='m'?v:v/12}
@@ -132,14 +164,16 @@ function addBenefitsUi(){
   if(sub&&!$('jobValueHint')){
     const hint=document.createElement('div');
     hint.id='jobValueHint';hint.className='info';
-    hint.innerHTML='<b>Zwei Blickwinkel:</b> Der normale Netto-Stundenwert nutzt die vertragliche Durchschnittsarbeitszeit. Der effektive Jobwert berücksichtigt zusätzlich Urlaub, unbezahlte Überstunden, Pendelzeit, Pendelkosten, Sonderzahlungen und den Netto-Gegenwert von Benefits.';
+    hint.innerHTML='<b>Zwei Blickwinkel:</b> Der normale Netto-Stundenwert nutzt die vertragliche Durchschnittsarbeitszeit. Der effektive Jobwert berücksichtigt zusätzlich Urlaub, unbezahlte Überstunden, Pendelzeit, Pendelkosten, Sonderzahlungen und den Netto-Gegenwert von Benefits. Sonderzahlungen werden als sonstiger Bezug nach dem BMF-PAP 2026 berechnet.';
     sub.after(hint);
   }
   const effRows=$('commuteCostB')?.closest('.rows');
   if(effRows&&!$('benefitYearA')){
     const rowA=document.createElement('div');rowA.className='row';rowA.innerHTML='<span>Benefits/Jahr Job A</span><strong id="benefitYearA"></strong>';
     const rowB=document.createElement('div');rowB.className='row';rowB.innerHTML='<span>Benefits/Jahr Job B</span><strong id="benefitYearB"></strong>';
-    $('commuteCostB').closest('.row').after(rowA,rowB);
+    const spA=document.createElement('div');spA.className='row';spA.innerHTML='<span>Sonderzahlung netto Job A</span><strong id="specialNetA"></strong>';
+    const spB=document.createElement('div');spB.className='row';spB.innerHTML='<span>Sonderzahlung netto Job B</span><strong id="specialNetB"></strong>';
+    $('commuteCostB').closest('.row').after(spA,spB,rowA,rowB);
   }
 }
 addBenefitsUi();
@@ -156,7 +190,8 @@ function job(which){
  const oneWayMin=Math.max(0,+$('min'+which).value||0);
  const kmCost=Math.max(0,+$('kmCost'+which).value||0);
  const specialGross=Math.max(0,+$('special'+which).value||0);
- const benefitMonthly=Math.max(0,+$('benefit'+which)?.value||0);
+ const special=calcSpecialPayment(g,specialGross);
+ const benefitMonthly=Math.max(0,+($('benefit'+which)?.value||0));
  const annualBenefits=benefitMonthly*12;
  const vacationWeeks=vacation/workDays;
  const workingWeeks=Math.max(0,52-vacationWeeks);
@@ -166,11 +201,10 @@ function job(which){
  const commuteHours=(oneWayMin*2*commuteDays)/60;
  const commuteCost=oneWayKm*2*commuteDays*kmCost;
  const effectiveHours=actualWorkHours+overtimeHours+commuteHours;
- const avgGrossWithSpecial=(g*12+specialGross)/12;
- const annualNetWithSpecial=calcNet(avgGrossWithSpecial)*12;
+ const annualNetWithSpecial=n*12+special.net;
  const effectiveAnnualNet=Math.max(0,annualNetWithSpecial+annualBenefits-commuteCost);
  const effectiveNetHour=effectiveHours>0?effectiveAnnualNet/effectiveHours:0;
- return {g,h,mh,n,nh:n/mh,workDays,vacation,home,officeDays,overtime,oneWayKm,oneWayMin,kmCost,specialGross,benefitMonthly,annualBenefits,workingWeeks,actualWorkHours,overtimeHours,commuteHours,commuteCost,effectiveHours,annualNetWithSpecial,effectiveAnnualNet,effectiveNetHour};
+ return {g,h,mh,n,nh:n/mh,workDays,vacation,home,officeDays,overtime,oneWayKm,oneWayMin,kmCost,specialGross,special,benefitMonthly,annualBenefits,workingWeeks,actualWorkHours,overtimeHours,commuteHours,commuteCost,effectiveHours,annualNetWithSpecial,effectiveAnnualNet,effectiveNetHour};
 }
 $('calcCompare').onclick=()=>{
  const a=job('A'),b=job('B'),na=$('nameA').value||'Job A',nb=$('nameB').value||'Job B';
@@ -188,6 +222,8 @@ $('calcCompare').onclick=()=>{
  $('effTimeB').textContent=nf(b.effectiveHours,1)+' Std.';
  $('commuteCostA').textContent=eur(a.commuteCost,0);
  $('commuteCostB').textContent=eur(b.commuteCost,0);
+ if($('specialNetA'))$('specialNetA').textContent=eur(a.special.net,0);
+ if($('specialNetB'))$('specialNetB').textContent=eur(b.special.net,0);
  if($('benefitYearA'))$('benefitYearA').textContent=eur(a.annualBenefits,0);
  if($('benefitYearB'))$('benefitYearB').textContent=eur(b.annualBenefits,0);
  const ed=b.effectiveNetHour-a.effectiveNetHour;
@@ -196,7 +232,7 @@ $('calcCompare').onclick=()=>{
  if(a.effectiveNetHour>b.effectiveNetHour)$('effBoxA').classList.add('winner'); else if(b.effectiveNetHour>a.effectiveNetHour)$('effBoxB').classList.add('winner');
  const effWinner=b.effectiveNetHour>a.effectiveNetHour?nb:na;
  const effGap=Math.abs(ed);
- $('effectiveSummary').textContent=`💎 ${effWinner} hat unter Einbeziehung von Urlaub, Homeoffice, Pendelzeit, Pendelkosten, Überstunden, Sonderzahlungen und Benefits den höheren effektiven Jobwert – um ${eur(effGap)} netto je tatsächlich gebundener Stunde.`;
+ $('effectiveSummary').textContent=`💎 ${effWinner} hat unter Einbeziehung von Urlaub, Homeoffice, Pendelzeit, Pendelkosten, Überstunden, nach BMF-PAP berechneten Sonderzahlungen und Benefits den höheren effektiven Jobwert – um ${eur(effGap)} netto je tatsächlich gebundener Stunde.`;
  $('compareResult').classList.remove('hidden');
 }
 
