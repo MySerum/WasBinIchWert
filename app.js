@@ -118,6 +118,32 @@ $('calcRechner').onclick=()=>{
  $('rechnerResult').classList.remove('hidden');
 }
 
+function addBenefitsUi(){
+  ['A','B'].forEach(which=>{
+    const special=$('special'+which);
+    if(!special||$('benefit'+which))return;
+    const grid=special.closest('.grid2');
+    const wrap=document.createElement('div');
+    wrap.innerHTML=`<label>Benefits – Netto-Wert/Monat</label><div class="field"><input id="benefit${which}" type="number" value="0" min="0" step="10"><span class="suffix">€</span></div>`;
+    grid.appendChild(wrap);
+  });
+  const section=$('tab-vergleich');
+  const sub=section?.querySelector('.section-sub');
+  if(sub&&!$('jobValueHint')){
+    const hint=document.createElement('div');
+    hint.id='jobValueHint';hint.className='info';
+    hint.innerHTML='<b>Zwei Blickwinkel:</b> Der normale Netto-Stundenwert nutzt die vertragliche Durchschnittsarbeitszeit. Der effektive Jobwert berücksichtigt zusätzlich Urlaub, unbezahlte Überstunden, Pendelzeit, Pendelkosten, Sonderzahlungen und den Netto-Gegenwert von Benefits.';
+    sub.after(hint);
+  }
+  const effRows=$('commuteCostB')?.closest('.rows');
+  if(effRows&&!$('benefitYearA')){
+    const rowA=document.createElement('div');rowA.className='row';rowA.innerHTML='<span>Benefits/Jahr Job A</span><strong id="benefitYearA"></strong>';
+    const rowB=document.createElement('div');rowB.className='row';rowB.innerHTML='<span>Benefits/Jahr Job B</span><strong id="benefitYearB"></strong>';
+    $('commuteCostB').closest('.row').after(rowA,rowB);
+  }
+}
+addBenefitsUi();
+
 function job(which){
  const g=compareGross('gross'+which,which==='A'?aMode:bMode);
  const h=+$('hours'+which).value||0,mh=h*52/12,n=calcNet(g);
@@ -130,6 +156,8 @@ function job(which){
  const oneWayMin=Math.max(0,+$('min'+which).value||0);
  const kmCost=Math.max(0,+$('kmCost'+which).value||0);
  const specialGross=Math.max(0,+$('special'+which).value||0);
+ const benefitMonthly=Math.max(0,+$('benefit'+which)?.value||0);
+ const annualBenefits=benefitMonthly*12;
  const vacationWeeks=vacation/workDays;
  const workingWeeks=Math.max(0,52-vacationWeeks);
  const actualWorkHours=h*workingWeeks;
@@ -140,9 +168,9 @@ function job(which){
  const effectiveHours=actualWorkHours+overtimeHours+commuteHours;
  const avgGrossWithSpecial=(g*12+specialGross)/12;
  const annualNetWithSpecial=calcNet(avgGrossWithSpecial)*12;
- const effectiveAnnualNet=Math.max(0,annualNetWithSpecial-commuteCost);
+ const effectiveAnnualNet=Math.max(0,annualNetWithSpecial+annualBenefits-commuteCost);
  const effectiveNetHour=effectiveHours>0?effectiveAnnualNet/effectiveHours:0;
- return {g,h,mh,n,nh:n/mh,workDays,vacation,home,officeDays,overtime,oneWayKm,oneWayMin,kmCost,specialGross,workingWeeks,actualWorkHours,overtimeHours,commuteHours,commuteCost,effectiveHours,annualNetWithSpecial,effectiveAnnualNet,effectiveNetHour};
+ return {g,h,mh,n,nh:n/mh,workDays,vacation,home,officeDays,overtime,oneWayKm,oneWayMin,kmCost,specialGross,benefitMonthly,annualBenefits,workingWeeks,actualWorkHours,overtimeHours,commuteHours,commuteCost,effectiveHours,annualNetWithSpecial,effectiveAnnualNet,effectiveNetHour};
 }
 $('calcCompare').onclick=()=>{
  const a=job('A'),b=job('B'),na=$('nameA').value||'Job A',nb=$('nameB').value||'Job B';
@@ -160,13 +188,15 @@ $('calcCompare').onclick=()=>{
  $('effTimeB').textContent=nf(b.effectiveHours,1)+' Std.';
  $('commuteCostA').textContent=eur(a.commuteCost,0);
  $('commuteCostB').textContent=eur(b.commuteCost,0);
+ if($('benefitYearA'))$('benefitYearA').textContent=eur(a.annualBenefits,0);
+ if($('benefitYearB'))$('benefitYearB').textContent=eur(b.annualBenefits,0);
  const ed=b.effectiveNetHour-a.effectiveNetHour;
  $('effDiff').textContent=(ed>=0?'+ ':'− ')+eur(Math.abs(ed));
  $('effBoxA').classList.remove('winner');$('effBoxB').classList.remove('winner');
  if(a.effectiveNetHour>b.effectiveNetHour)$('effBoxA').classList.add('winner'); else if(b.effectiveNetHour>a.effectiveNetHour)$('effBoxB').classList.add('winner');
  const effWinner=b.effectiveNetHour>a.effectiveNetHour?nb:na;
  const effGap=Math.abs(ed);
- $('effectiveSummary').textContent=`💎 ${effWinner} hat unter Einbeziehung von Urlaub, Homeoffice, Pendelzeit, Pendelkosten, Überstunden und Sonderzahlungen den höheren effektiven Jobwert – um ${eur(effGap)} netto je tatsächlich gebundener Stunde.`;
+ $('effectiveSummary').textContent=`💎 ${effWinner} hat unter Einbeziehung von Urlaub, Homeoffice, Pendelzeit, Pendelkosten, Überstunden, Sonderzahlungen und Benefits den höheren effektiven Jobwert – um ${eur(effGap)} netto je tatsächlich gebundener Stunde.`;
  $('compareResult').classList.remove('hidden');
 }
 
