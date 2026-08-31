@@ -1,33 +1,35 @@
-// v8.22 – PDF-Bericht PRO
-function addPdfExportUi(){if($('pdfExportBtn'))return;const result=$('compareResult');if(!result)return;const wrap=document.createElement('div');wrap.className='pdf-export-card';wrap.innerHTML=`<div><strong>PDF-Bericht <span class="pro-badge">PRO</span></strong><small>Jobvergleich im WasBinIchWert-Design speichern oder teilen.</small></div><button type="button" id="pdfExportBtn">PDF-Bericht erstellen</button>`;result.appendChild(wrap);$('pdfExportBtn').onclick=createPdfReport}
-function pdfEsc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
-function pdfVal(id,fallback='–'){return $(id)?.textContent?.trim()||fallback}
-function createPdfReport(){
-  const a=job('A'),b=job('B'),na=$('nameA').value||'Job A',nb=$('nameB').value||'Job B';
-  const winner=b.effectiveNetHour>a.effectiveNetHour?nb:na;
-  const date=new Intl.DateTimeFormat('de-DE',{dateStyle:'long'}).format(new Date());
-  const diff=(bv,av,d=0)=>{const x=bv-av;return `${x>=0?'+':'−'}${eur(Math.abs(x),d)}`};
-  const hours=(v)=>`${nf(v,0)} h`;
-  const row=(label,av,bv,dv,hi='')=>`<tr class="${hi}"><td>${label}</td><td>${av}</td><td>${bv}</td><td>${dv}</td></tr>`;
-  const rows=[
-    row('Monatsbrutto',eur(a.g,0),eur(b.g,0),diff(b.g,a.g)),
-    row('Monatsnetto',eur(a.n,0),eur(b.n,0),diff(b.n,a.n)),
-    row('Wochenstunden',`${nf(a.h,1)} h`,`${nf(b.h,1)} h`,`${b.h-a.h>=0?'+':'−'}${nf(Math.abs(b.h-a.h),1)} h`),
-    row('Urlaubstage/Jahr',nf(a.vacation,0),nf(b.vacation,0),`${b.vacation-a.vacation>=0?'+':'−'}${nf(Math.abs(b.vacation-a.vacation),0)}`),
-    row('Netto/Stunde',eur(a.nh),eur(b.nh),diff(b.nh,a.nh,2)),
-    row('Gebundene Zeit/Jahr',hours(a.effectiveHours),hours(b.effectiveHours),`${b.effectiveHours-a.effectiveHours>=0?'+':'−'}${hours(Math.abs(b.effectiveHours-a.effectiveHours))}`),
-    row('Pendelkosten/Jahr',eur(a.commuteCost,0),eur(b.commuteCost,0),diff(b.commuteCost,a.commuteCost)),
-    row('Weitere Kosten/Jahr',eur(a.extraCosts,0),eur(b.extraCosts,0),diff(b.extraCosts,a.extraCosts)),
-    row('Sonderzahlung netto',eur(a.special.net,0),eur(b.special.net,0),diff(b.special.net,a.special.net)),
-    row('Benefits/Jahr',eur(a.benefits.annual,0),eur(b.benefits.annual,0),diff(b.benefits.annual,a.benefits.annual)),
-    row('Homeoffice-Ersparnis/Jahr',eur(a.homeSavings,0),eur(b.homeSavings,0),diff(b.homeSavings,a.homeSavings)),
-    row('Effektiver Jahreswert',eur(a.effectiveAnnualNet,0),eur(b.effectiveAnnualNet,0),diff(b.effectiveAnnualNet,a.effectiveAnnualNet),'hi'),
-    row('Effektiver Netto-Stundenwert',eur(a.effectiveNetHour),eur(b.effectiveNetHour),diff(b.effectiveNetHour,a.effectiveNetHour,2),'hi')
-  ].join('');
-  const decision=pdfEsc($('decisionText')?.textContent||`${winner} erreicht unter den eingegebenen Faktoren den höheren effektiven Netto-Stundenwert.`);
-  const html=`<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>WasBinIchWert – ${pdfEsc(na)} vs. ${pdfEsc(nb)}</title><style>
-  @page{size:A4;margin:14mm}*{box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif;color:#0D1B2A;margin:0;font-size:10.5pt}.head{display:flex;align-items:center;gap:12px;border-bottom:2px solid #D4A72C;padding-bottom:10px;margin-bottom:18px}.mark{width:58px;height:58px}.brand{font-size:23pt;font-weight:800;letter-spacing:-1px}.brand i{font-style:normal;color:#D4A72C}.slogan{font-size:9pt;margin-top:2px}.meta{margin-left:auto;text-align:right;font-size:8.5pt;color:#657086}h1{font-size:18pt;margin:0 0 4px}h2{font-size:11pt;margin:20px 0 7px}.sub{color:#657086;margin-bottom:15px}.jobs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}.job{border:1px solid #dfe5ed;border-radius:10px;padding:10px}.job b{display:block;font-size:12pt;margin-bottom:4px}.job strong{font-size:18pt;color:#159947}.winner{background:#f2fbf5;border-color:#9bd7ae}.winner:before{content:'WasBinIchWert-Favorit';display:block;text-transform:uppercase;font-size:7.5pt;font-weight:800;color:#39724b;margin-bottom:5px}table{width:100%;border-collapse:collapse;table-layout:fixed}th,td{padding:6px 5px;border-bottom:1px solid #e2e7ef;text-align:right}th:first-child,td:first-child{text-align:left;width:37%}thead th{background:#f5f7fb}.hi td{font-weight:800;background:#f2fbf5}.decision{border:1px solid #bde3c8;background:#f2fbf5;border-radius:10px;padding:11px;margin-top:16px;line-height:1.45}.decision b{display:block;margin-bottom:4px}.foot{margin-top:18px;border-top:1px solid #e2e7ef;padding-top:8px;color:#7a8498;font-size:7.5pt;line-height:1.4}.printbar{position:sticky;top:0;background:#fff;padding:10px 0 12px;display:flex;gap:8px;z-index:2}.printbar button{border:0;border-radius:9px;background:#2f43d7;color:#fff;padding:10px 14px;font-weight:700}.printbar .close{background:#eef1f6;color:#0D1B2A}@media print{.printbar{display:none}.job,table,.decision{break-inside:avoid}}@media(max-width:600px){body{padding:12px}.head{align-items:flex-start}.meta{font-size:7.5pt}.jobs{grid-template-columns:1fr 1fr}th,td{font-size:8pt;padding:5px 3px}}
-  </style></head><body><div class="printbar"><button onclick="window.print()">Als PDF speichern / drucken</button><button class="close" onclick="window.close()">Schließen</button></div><div class="head"><img class="mark" src="${location.origin}${location.pathname.replace(/[^/]*$/,'')}brand-mark.svg"><div><div class="brand">WasBin<i>Ich</i>Wert</div><div class="slogan">Deine Zeit ist mehr wert.</div></div><div class="meta">Jobvergleich<br>${date}</div></div><h1>Jobvergleich</h1><div class="sub">${pdfEsc(na)} im Vergleich mit ${pdfEsc(nb)}</div><div class="jobs"><div class="job ${winner===na?'winner':''}"><b>${pdfEsc(na)}</b><strong>${eur(a.effectiveNetHour)}</strong><span> effektiv netto/Stunde</span></div><div class="job ${winner===nb?'winner':''}"><b>${pdfEsc(nb)}</b><strong>${eur(b.effectiveNetHour)}</strong><span> effektiv netto/Stunde</span></div></div><h2>Vergleich im Überblick</h2><table><thead><tr><th>Kennzahl</th><th>${pdfEsc(na)}</th><th>${pdfEsc(nb)}</th><th>Δ B−A</th></tr></thead><tbody>${rows}</tbody></table><div class="decision"><b>WasBinIchWert-Bewertung: ${pdfEsc(winner)} liegt vorn</b>${decision}</div><div class="foot">Berechnung auf Basis der in WasBinIchWert eingegebenen Angaben. Der Bericht dient der persönlichen Orientierung und stellt keine Steuer-, Rechts- oder Finanzberatung dar. Steuer- und Sozialversicherungswerte können durch individuelle Besonderheiten abweichen.</div></body></html>`;
-  const w=window.open('','_blank');if(!w){alert('Der PDF-Bericht konnte nicht geöffnet werden. Bitte Pop-ups für diese Seite erlauben.');return}w.document.open();w.document.write(html);w.document.close();
+// v8.23 – echter PDF-Export statt window.print()
+function addPdfExportUi(){if($('pdfExportBtn'))return;const result=$('compareResult');if(!result)return;const wrap=document.createElement('div');wrap.className='pdf-export-card';wrap.innerHTML=`<div><strong>PDF-Bericht <span class="pro-badge">PRO</span></strong><small>Jobvergleich als echte PDF-Datei speichern oder teilen.</small></div><button type="button" id="pdfExportBtn">PDF-Bericht erstellen</button>`;result.appendChild(wrap);$('pdfExportBtn').onclick=createPdfReport}
+function safePdfText(v){return String(v??'').replace(/−/g,'-').replace(/–/g,'-').replace(/…/g,'...').replace(/✓/g,'').trim()}
+function wrapPdfText(text,font,size,maxWidth){const words=safePdfText(text).split(/\s+/),lines=[];let line='';for(const w of words){const test=line?line+' '+w:w;if(font.widthOfTextAtSize(test,size)<=maxWidth)line=test;else{if(line)lines.push(line);line=w}}if(line)lines.push(line);return lines}
+async function createPdfReport(){
+  const btn=$('pdfExportBtn');const old=btn.textContent;btn.disabled=true;btn.textContent='PDF wird erstellt ...';
+  try{
+    const {PDFDocument,StandardFonts,rgb}=await import('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm');
+    const pdf=await PDFDocument.create(),font=await pdf.embedFont(StandardFonts.Helvetica),bold=await pdf.embedFont(StandardFonts.HelveticaBold);
+    const navy=rgb(13/255,27/255,42/255),gold=rgb(212/255,167/255,44/255),green=rgb(21/255,153/255,71/255),muted=rgb(.40,.45,.54),line=rgb(.88,.91,.94),soft=rgb(.95,.98,.96);
+    const a=job('A'),b=job('B'),na=$('nameA').value||'Job A',nb=$('nameB').value||'Job B',winner=b.effectiveNetHour>a.effectiveNetHour?nb:na;
+    const diff=(bv,av,d=0)=>{const x=bv-av;return `${x>=0?'+':'-'}${eur(Math.abs(x),d)}`};
+    const rows=[['Monatsbrutto',eur(a.g,0),eur(b.g,0),diff(b.g,a.g)],['Monatsnetto',eur(a.n,0),eur(b.n,0),diff(b.n,a.n)],['Wochenstunden',`${nf(a.h,1)} h`,`${nf(b.h,1)} h`,`${b.h-a.h>=0?'+':'-'}${nf(Math.abs(b.h-a.h),1)} h`],['Urlaub/Jahr',`${nf(a.vacation,0)} Tage`,`${nf(b.vacation,0)} Tage`,`${b.vacation-a.vacation>=0?'+':'-'}${nf(Math.abs(b.vacation-a.vacation),0)}`],['Netto/Stunde',eur(a.nh),eur(b.nh),diff(b.nh,a.nh,2)],['Gebundene Zeit/Jahr',`${nf(a.effectiveHours,0)} h`,`${nf(b.effectiveHours,0)} h`,`${b.effectiveHours-a.effectiveHours>=0?'+':'-'}${nf(Math.abs(b.effectiveHours-a.effectiveHours),0)} h`],['Pendelkosten/Jahr',eur(a.commuteCost,0),eur(b.commuteCost,0),diff(b.commuteCost,a.commuteCost)],['Weitere Kosten/Jahr',eur(a.extraCosts,0),eur(b.extraCosts,0),diff(b.extraCosts,a.extraCosts)],['Sonderzahlung netto',eur(a.special.net,0),eur(b.special.net,0),diff(b.special.net,a.special.net)],['Benefits/Jahr',eur(a.benefits.annual,0),eur(b.benefits.annual,0),diff(b.benefits.annual,a.benefits.annual)],['Homeoffice-Ersparnis',eur(a.homeSavings,0),eur(b.homeSavings,0),diff(b.homeSavings,a.homeSavings)],['Effektiver Jahreswert',eur(a.effectiveAnnualNet,0),eur(b.effectiveAnnualNet,0),diff(b.effectiveAnnualNet,a.effectiveAnnualNet)],['Effektiv netto/Stunde',eur(a.effectiveNetHour),eur(b.effectiveNetHour),diff(b.effectiveNetHour,a.effectiveNetHour,2)]];
+    let page=pdf.addPage([595.28,841.89]),{width,height}=page.getSize(),y=height-46;const left=42,right=width-42;
+    const text=(t,x,yy,size=10,f=font,c=navy)=>page.drawText(safePdfText(t),{x,y:yy,size,font:f,color:c});
+    const rule=(yy,c=line,w=1)=>page.drawLine({start:{x:left,y:yy},end:{x:right,y:yy},thickness:w,color:c});
+    text('WasBin',left,y,22,bold,navy);const w1=bold.widthOfTextAtSize('WasBin',22);text('Ich',left+w1,y,22,bold,gold);const w2=bold.widthOfTextAtSize('Ich',22);text('Wert',left+w1+w2,y,22,bold,navy);text('Deine Zeit ist mehr wert.',left,y-17,9,font,navy);text('Jobvergleich - PRO',right-105,y,9,bold,muted);text(new Intl.DateTimeFormat('de-DE').format(new Date()),right-72,y-14,8,font,muted);rule(y-27,gold,2);y-=58;
+    text('Jobvergleich',left,y,18,bold,navy);y-=20;text(`${na} vs. ${nb}`,left,y,10,font,muted);y-=28;
+    page.drawRectangle({x:left,y:y-58,width:right-left,height:58,borderColor:rgb(.74,.89,.78),borderWidth:1,color:soft});text('WasBinIchWert-Bewertung',left+12,y-16,8,bold,green);text(`${winner} liegt insgesamt vorn`,left+12,y-36,14,bold,navy);y-=74;
+    const cols=[left,left+178,left+295,left+412,right],heads=['Kennzahl',na,nb,'Delta'];const rowH=24;
+    page.drawRectangle({x:left,y:y-rowH,width:right-left,height:rowH,color:rgb(.965,.975,.99)});heads.forEach((h,i)=>text(h,cols[i]+4,y-16,8,bold,muted));y-=rowH;
+    for(let i=0;i<rows.length;i++){
+      if(y<150){page=pdf.addPage([595.28,841.89]);({width,height}=page.getSize());y=height-46;text('WasBinIchWert - Jobvergleich',left,y,12,bold,navy);y-=24}
+      if(i>=11)page.drawRectangle({x:left,y:y-rowH,width:right-left,height:rowH,color:soft});
+      const f=i>=11?bold:font;rows[i].forEach((v,j)=>text(v,cols[j]+4,y-16,8,f,navy));rule(y-rowH);y-=rowH;
+    }
+    y-=18;text('Einordnung',left,y,12,bold,navy);y-=18;const decision=$('decisionText')?.textContent||`${winner} erreicht unter den eingegebenen Faktoren den höheren effektiven Netto-Stundenwert.`;for(const l of wrapPdfText(decision,font,9,right-left)){text(l,left,y,9,font,navy);y-=13}
+    y-=10;rule(y);y-=15;for(const l of wrapPdfText('Die Berechnung dient der persoenlichen Orientierung. Steuer- und Sozialversicherungswerte koennen durch individuelle Besonderheiten abweichen. Keine Steuer-, Rechts- oder Finanzberatung.',font,7.5,right-left)){text(l,left,y,7.5,font,muted);y-=10}
+    const bytes=await pdf.save(),blob=new Blob([bytes],{type:'application/pdf'}),fileName=`WasBinIchWert_${safePdfText(na).replace(/[^A-Za-z0-9_-]+/g,'_')}_vs_${safePdfText(nb).replace(/[^A-Za-z0-9_-]+/g,'_')}.pdf`,file=new File([blob],fileName,{type:'application/pdf'});
+    if(navigator.share&&navigator.canShare?.({files:[file]})){await navigator.share({files:[file],title:'WasBinIchWert Jobvergleich',text:`${na} vs. ${nb}`})}
+    else{const url=URL.createObjectURL(blob),aEl=document.createElement('a');aEl.href=url;aEl.download=fileName;document.body.appendChild(aEl);aEl.click();aEl.remove();setTimeout(()=>URL.revokeObjectURL(url),30000)}
+  }catch(e){console.error(e);alert('Die PDF konnte nicht erstellt werden. Bitte erneut versuchen.')}
+  finally{btn.disabled=false;btn.textContent=old}
 }
 addPdfExportUi();
