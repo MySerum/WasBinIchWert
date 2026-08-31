@@ -1,0 +1,1 @@
+document.querySelector('.brand-icon')?.setAttribute('src','./brand-mark.svg');
