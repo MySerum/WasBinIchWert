@@ -1,4 +1,4 @@
-const CACHE='wasbinichwert-pages-v823';
+const CACHE='wasbinichwert-pages-v824';
 const LOCAL=['./','./index.html','./styles.css','./app.js','./comparison-table.js','./pdf-export.js','./brand-runtime.js','./brand-mark.svg','./manifest.webmanifest','./icon.svg'];
 const PAP='https://cdn.jsdelivr.net/npm/lohnsteuerrechner/+esm';
 self.addEventListener('install',e=>e.waitUntil((async()=>{const c=await caches.open(CACHE);await c.addAll(LOCAL);try{const r=await fetch(PAP,{mode:'cors'});if(r.ok)await c.put(PAP,r.clone())}catch{}self.skipWaiting()})()));
