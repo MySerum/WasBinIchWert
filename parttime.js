@@ -36,7 +36,7 @@
   section.innerHTML=`
     <h2 class="section-title">Teilzeit vergleichen</h2>
     <div class="section-sub">Was kostet dich weniger Arbeitszeit – und wie viel freie Zeit gewinnst du?</div>
-    <div class="info"><b>Stufe 2:</b> Neben dem proportionalen Teilzeit-Brutto kannst du jetzt auch Arbeitsweg, Homeoffice und reale Jobkosten berücksichtigen. Deine Angaben aus „Meine Daten“ gelten automatisch für die Netto-Berechnung.</div>
+    <div class="info"><b>So wird gerechnet:</b> Dein Teilzeit-Brutto wird zunächst proportional zu den Wochenstunden berechnet. Optional kannst du im PRO-Bereich zusätzlich Arbeitsweg, Homeoffice und reale Jobkosten einbeziehen. Deine Angaben aus „Meine Daten“ gelten automatisch für die Netto-Berechnung.</div>
 
     <div class="card">
       <h3>Ausgangsmodell</h3>
