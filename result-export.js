@@ -1,4 +1,4 @@
-// WasBinIchWert v8.37 – zentrale Ergebnisansicht: robuster PDF-Export & Teilen
+// WasBinIchWert v8.38 – zentrale Ergebnisansicht: PDF-Zeilenlayout korrigiert
 (function initResultExport(){
   const dashboard=document.getElementById('tab-ergebnis');
   if(!dashboard||document.getElementById('resultExportCard'))return;
@@ -82,7 +82,7 @@
       const d=collect();
       const {PDFDocument,StandardFonts,rgb}=await import('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm');
       const pdf=await PDFDocument.create(),font=await pdf.embedFont(StandardFonts.Helvetica),bold=await pdf.embedFont(StandardFonts.HelveticaBold);
-      const navy=rgb(13/255,27/255,42/255),gold=rgb(212/255,167/255,44/255),green=rgb(21/255,153/255,71/255),muted=rgb(.40,.45,.54),line=rgb(.88,.91,.94),soft=rgb(.95,.98,.96),purple=rgb(.49,.13,.81);
+      const navy=rgb(13/255,27/255,42/255),gold=rgb(212/255,167/255,44/255),green=rgb(21/255,153/255,71/255),muted=rgb(.40,.45,.54),line=rgb(.90,.92,.95),soft=rgb(.95,.98,.96),purple=rgb(.49,.13,.81);
       let page=pdf.addPage([595.28,841.89]),{width,height}=page.getSize(),y=height-46;const left=42,right=width-42,maxW=right-left;
       const draw=(t,x,yy,size=9,f=font,c=navy)=>page.drawText(safe(t),{x,y:yy,size,font:f,color:c});
       const rightText=(t,xr,yy,size=9,f=font,c=navy)=>{const s=safe(t);draw(s,xr-f.widthOfTextAtSize(s,size),yy,size,f,c)};
@@ -90,7 +90,19 @@
       const wrap=(t,size=9,max=maxW)=>{const words=safe(t).split(/\s+/),out=[];let l='';for(const w of words){const q=l?l+' '+w:w;if(font.widthOfTextAtSize(q,size)<=max)l=q;else{if(l)out.push(l);l=w}}if(l)out.push(l);return out};
       const newPage=()=>{page=pdf.addPage([595.28,841.89]);({width,height}=page.getSize());y=height-46;draw('WasBinIchWert - Dein Job auf einen Blick',left,y,10,bold,navy);y-=22;};
       const ensure=(need=60)=>{if(y-need<45)newPage();};
-      const section=(title,rows,color=navy)=>{ensure(36+rows.length*22);draw(title,left,y,12,bold,color);y-=15;for(const [k,v] of rows){draw(k,left,y,8,font,muted);rightText(v,right,y,9,bold,navy);y-=18;rule(y);y-=4}y-=8;};
+      const section=(title,rows,color=navy)=>{
+        const rowH=26,titleGap=22,lineOffset=12;
+        ensure(38+rows.length*rowH);
+        draw(title,left,y,12,bold,color);
+        y-=titleGap;
+        for(const [k,v] of rows){
+          draw(k,left,y,8,font,muted);
+          rightText(v,right,y,9,bold,navy);
+          rule(y-lineOffset);
+          y-=rowH;
+        }
+        y-=6;
+      };
 
       draw('WasBin',left,y,22,bold,navy);const w1=bold.widthOfTextAtSize('WasBin',22);draw('Ich',left+w1,y,22,bold,gold);const w2=bold.widthOfTextAtSize('Ich',22);draw('Wert',left+w1+w2,y,22,bold,navy);draw('Deine Zeit ist mehr wert.',left,y-17,9,font,navy);rightText('Ergebnisbericht - PRO',right,y,9,bold,muted);rightText(d.date,right,y-14,8,font,muted);rule(y-27,gold,2);y-=58;
 
