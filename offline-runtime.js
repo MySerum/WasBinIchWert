@@ -1,10 +1,10 @@
-// WasBinIchWert v8.42 – Offline-Härtung: Status & Cache-Diagnose
+// WasBinIchWert v8.43 – Offline-Härtung: Safari-kompatibles PDF-Modul
 (function initOfflineRuntime(){
   const more=document.getElementById('tab-mehr');
   if(!more||document.getElementById('offlineStatusCard'))return;
 
   const PAP='https://cdn.jsdelivr.net/npm/lohnsteuerrechner/+esm';
-  const PDFLIB='https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm';
+  const PDFLIB=window.WIW_PDFLIB_SRC||'https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js';
   const style=document.createElement('style');
   style.textContent=`
     .offline-card{border:1px solid #cfe7d7;background:#f7fcf8}.offline-card p{font-size:12px;line-height:1.5;color:#56627a;margin:0 0 12px}.offline-state{display:grid;gap:7px;margin:10px 0}.offline-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;border-top:1px solid #e5eee8;padding-top:8px;font-size:12px}.offline-row:first-child{border-top:0;padding-top:0}.offline-ok{color:#167a3c;font-weight:850}.offline-warn{color:#9a6815;font-weight:850}.offline-bad{color:#a32929;font-weight:850}.offline-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.offline-secondary{border:1px solid #d8deea;background:#fff;color:var(--navy);border-radius:11px;padding:10px 11px;font-size:12px;font-weight:800}@media(max-width:380px){.offline-actions{grid-template-columns:1fr}}
@@ -25,7 +25,7 @@
     setState('offTax',tax?'gespeichert':'noch nicht',tax?'ok':'warn');
     setState('offPdf',pdf?'gespeichert':'noch nicht',pdf?'ok':'warn');
     const note=document.getElementById('offNote');
-    if(!navigator.onLine&&tax)note.textContent='✓ Offline-Modus aktiv. Rechner und bereits lokal gespeicherte App-Funktionen stehen zur Verfügung.';
+    if(!navigator.onLine&&tax&&pdf)note.textContent='✓ Offline-Modus aktiv. Rechner und PDF-Erstellung sind vorbereitet.';
     else if(tax&&pdf)note.textContent='✓ Für den Offline-Test vorbereitet. Du kannst die Verbindung trennen und die PWA neu öffnen.';
     else note.textContent='Für einen zuverlässigen Offline-Test einmal „Offline vorbereiten“ ausführen, solange eine Internetverbindung besteht.';
   }
