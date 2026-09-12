@@ -36,11 +36,21 @@ jobs:
           ./node_modules/.bin/esbuild vendor-entry-tax.js --bundle --format=esm --platform=browser --target=es2020 --minify --outfile=vendor/lohnsteuerrechner.js
           ./node_modules/.bin/esbuild vendor-entry-pdf.js --bundle --format=iife --global-name=PDFLib --platform=browser --target=es2018 --minify --outfile=vendor/pdf-lib.min.js
 
+      - name: Wire local tax bundle
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path('app.js')
+          s = p.read_text()
+          s = s.replace('https://cdn.jsdelivr.net/npm/lohnsteuerrechner/+esm', './vendor/lohnsteuerrechner.js')
+          p.write_text(s)
+          PY
+
       - name: Commit generated vendor files
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add vendor/lohnsteuerrechner.js vendor/pdf-lib.min.js package-lock.json
+          git add app.js vendor/lohnsteuerrechner.js vendor/pdf-lib.min.js package-lock.json
           if git diff --cached --quiet; then
             echo "No vendor changes"
             exit 0
