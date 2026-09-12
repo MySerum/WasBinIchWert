@@ -1,4 +1,4 @@
-// WasBinIchWert v8.38 – zentrale Ergebnisansicht: PDF-Zeilenlayout korrigiert
+// WasBinIchWert v8.43 – zentrale Ergebnisansicht: Safari-kompatibler PDF-Export
 (function initResultExport(){
   const dashboard=document.getElementById('tab-ergebnis');
   if(!dashboard||document.getElementById('resultExportCard'))return;
@@ -21,8 +21,6 @@
   if(refresh)refresh.after(card);else dashboard.appendChild(card);
 
   const isReady=id=>{const e=document.getElementById(id);return !!(e&&!e.classList.contains('hidden'))};
-  // pdf-lib StandardFonts.Helvetica nutzt WinAnsi. Zeichen wie Pfeile oder Emojis
-  // führen sonst beim drawText zu einem Fehler. Deshalb PDF-Texte bewusst normalisieren.
   const safe=v=>String(v??'')
     .replace(/→/g,'->').replace(/←/g,'<-').replace(/↔/g,'<->')
     .replace(/[−–—]/g,'-').replace(/…/g,'...').replace(/✓/g,'')
@@ -80,7 +78,7 @@
     const btn=$('resultPdfBtn'),status=$('resultExportStatus'),old=btn.textContent;btn.disabled=true;btn.textContent='PDF wird erstellt …';status.textContent='';
     try{
       const d=collect();
-      const {PDFDocument,StandardFonts,rgb}=await import('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm');
+      const {PDFDocument,StandardFonts,rgb}=await window.loadPdfLib();
       const pdf=await PDFDocument.create(),font=await pdf.embedFont(StandardFonts.Helvetica),bold=await pdf.embedFont(StandardFonts.HelveticaBold);
       const navy=rgb(13/255,27/255,42/255),gold=rgb(212/255,167/255,44/255),green=rgb(21/255,153/255,71/255),muted=rgb(.40,.45,.54),line=rgb(.90,.92,.95),soft=rgb(.95,.98,.96),purple=rgb(.49,.13,.81);
       let page=pdf.addPage([595.28,841.89]),{width,height}=page.getSize(),y=height-46;const left=42,right=width-42,maxW=right-left;
