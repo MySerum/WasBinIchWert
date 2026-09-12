@@ -1,0 +1,49 @@
+name: Build local vendor bundles
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - package.json
+      - vendor-entry-tax.js
+      - vendor-entry-pdf.js
+      - .github/workflows/build-vendor.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Build browser bundles
+        run: |
+          mkdir -p vendor
+          ./node_modules/.bin/esbuild vendor-entry-tax.js --bundle --format=esm --platform=browser --target=es2020 --minify --outfile=vendor/lohnsteuerrechner.js
+          ./node_modules/.bin/esbuild vendor-entry-pdf.js --bundle --format=iife --global-name=PDFLib --platform=browser --target=es2018 --minify --outfile=vendor/pdf-lib.min.js
+
+      - name: Commit generated vendor files
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add vendor/lohnsteuerrechner.js vendor/pdf-lib.min.js package-lock.json
+          if git diff --cached --quiet; then
+            echo "No vendor changes"
+            exit 0
+          fi
+          git commit -m "Build: refresh local vendor bundles"
+          git push
