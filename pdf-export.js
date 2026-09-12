@@ -1,4 +1,4 @@
-// v8.27 – PDF-Bericht PRO: Abstand zwischen Vorzeichen und Delta-Wert
+// v8.43 – PDF-Bericht PRO: Safari-kompatibler pdf-lib Loader
 function addPdfExportUi(){if($('pdfExportBtn'))return;const result=$('compareResult');if(!result)return;const wrap=document.createElement('div');wrap.className='pdf-export-card';wrap.innerHTML=`<div><strong>PDF-Bericht <span class="pro-badge">PRO</span></strong><small>Jobvergleich als echte PDF-Datei speichern oder teilen.</small></div><button type="button" id="pdfExportBtn">PDF-Bericht erstellen</button>`;result.appendChild(wrap);$('pdfExportBtn').onclick=createPdfReport}
 function safePdfText(v){return String(v??'').replace(/−/g,'-').replace(/–/g,'-').replace(/…/g,'...').replace(/✓/g,'').trim()}
 function wrapPdfText(text,font,size,maxWidth){const words=safePdfText(text).split(/\s+/),lines=[];let line='';for(const w of words){const test=line?line+' '+w:w;if(font.widthOfTextAtSize(test,size)<=maxWidth)line=test;else{if(line)lines.push(line);line=w}}if(line)lines.push(line);return lines}
@@ -7,7 +7,7 @@ function isMobileApple(){return /iPhone|iPad|iPod/i.test(navigator.userAgent)||(
 async function createPdfReport(){
   const btn=$('pdfExportBtn');const old=btn.textContent;btn.disabled=true;btn.textContent='PDF wird erstellt ...';
   try{
-    const {PDFDocument,StandardFonts,rgb}=await import('https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/+esm');
+    const {PDFDocument,StandardFonts,rgb}=await window.loadPdfLib();
     const pdf=await PDFDocument.create(),font=await pdf.embedFont(StandardFonts.Helvetica),bold=await pdf.embedFont(StandardFonts.HelveticaBold);
     const navy=rgb(13/255,27/255,42/255),gold=rgb(212/255,167/255,44/255),green=rgb(21/255,153/255,71/255),muted=rgb(.40,.45,.54),line=rgb(.88,.91,.94),soft=rgb(.95,.98,.96);
     const a=job('A'),b=job('B'),na=$('nameA').value||'Job A',nb=$('nameB').value||'Job B',winner=b.effectiveNetHour>a.effectiveNetHour?nb:na;
