@@ -1,4 +1,4 @@
-import { calculate as calculateLohnsteuer } from "https://cdn.jsdelivr.net/npm/lohnsteuerrechner/+esm";
+import { calculate as calculateLohnsteuer } from "./vendor/lohnsteuerrechner.js";
 
 const $=id=>document.getElementById(id);
 const eur=(n,d=2)=>new Intl.NumberFormat('de-DE',{style:'currency',currency:'EUR',minimumFractionDigits:d,maximumFractionDigits:d}).format(Number.isFinite(n)?n:0);
