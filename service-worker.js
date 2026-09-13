@@ -1,7 +1,7 @@
-// v8.46 – erweiterte Berechnungs- und Eingabeprüfungen; aktualisiert den Offline-Cache.
-const CACHE='wasbinichwert-pages-v846';
-const LOCAL=['./','./index.html','./styles.css','./app.js','./comparison-table.js','./pdf-lib-loader.js','./pdf-export.js','./brand-runtime.js','./parttime.js','./salary-growth-fix.js','./salary-negotiation.js','./result-export.js','./onboarding.js','./pro-access.js','./offline-runtime.js','./ui-consistency.js','./vendor/lohnsteuerrechner.js','./vendor/pdf-lib.min.js','./brand-mark.svg','./manifest.webmanifest','./icon.svg'];
-const MODULES=['./app.js','./comparison-table.js','./pdf-lib-loader.js','./pdf-export.js','./brand-runtime.js','./parttime.js','./salary-growth-fix.js','./salary-negotiation.js','./result-export.js','./onboarding.js','./pro-access.js','./offline-runtime.js','./ui-consistency.js'];
+// v8.46 – stabile Beta mit zentraler Versionsanzeige.
+const CACHE='wasbinichwert-pages-v846-release';
+const LOCAL=['./','./index.html','./styles.css','./app.js','./comparison-table.js','./pdf-lib-loader.js','./pdf-export.js','./brand-runtime.js','./parttime.js','./salary-growth-fix.js','./salary-negotiation.js','./result-export.js','./onboarding.js','./pro-access.js','./offline-runtime.js','./ui-consistency.js','./version-info.js','./vendor/lohnsteuerrechner.js','./vendor/pdf-lib.min.js','./brand-mark.svg','./manifest.webmanifest','./icon.svg'];
+const MODULES=['./app.js','./comparison-table.js','./pdf-lib-loader.js','./pdf-export.js','./brand-runtime.js','./parttime.js','./salary-growth-fix.js','./salary-negotiation.js','./result-export.js','./onboarding.js','./pro-access.js','./offline-runtime.js','./ui-consistency.js','./version-info.js'];
 const REMOTE_TAX='https://cdn.jsdelivr.net/npm/lohnsteuerrechner/+esm';
 const LOCAL_TAX='./vendor/lohnsteuerrechner.js';
 

@@ -22,6 +22,10 @@ diese drei Kernbereiche zusätzlich auf Desktop-, iPhone- und Android-Abmessunge
 Nach der einmaligen Installation laufen alle Prüfungen vollständig gegen die lokalen
 App-Dateien.
 
+Der aktuelle Funktionsstand steht im [Änderungsprotokoll](CHANGELOG.md). Vor einer
+stabilen Veröffentlichung wird die [Freigabe-Checkliste](RELEASE-CHECKLIST.md)
+durchlaufen.
+
 Beabsichtigte Layoutänderungen können mit neuen Referenzbildern bestätigt werden:
 
 ```bash

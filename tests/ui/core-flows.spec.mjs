@@ -21,6 +21,14 @@ test.beforeEach(async ({ page }) => {
   await openControlledApp(page);
 });
 
+test('Mehr zeigt die zentrale App-Version und Versionshinweise', async ({ page }) => {
+  await openMore(page);
+  await expect(page.locator('#versionInfo')).toBeVisible();
+  await expect(page.locator('#versionInfo .version-number')).toHaveText('v8.46');
+  await page.locator('#versionInfo summary').click();
+  await expect(page.locator('#versionInfo li')).toHaveCount(4);
+});
+
 test('Rechner zeigt für Gehalt und Arbeitszeit ein vollständiges Ergebnis', async ({ page }) => {
   await page.locator('#salary').fill('5000');
   await page.locator('#hours').fill('38');

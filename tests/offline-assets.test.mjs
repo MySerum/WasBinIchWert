@@ -9,7 +9,7 @@ const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const worker = await readFile(path.join(root, 'service-worker.js'), 'utf8');
 
 test('v8.46 verwendet einen neuen Offline-Cache', () => {
-  assert.match(worker, /const CACHE='wasbinichwert-pages-v846';/);
+  assert.match(worker, /const CACHE='wasbinichwert-pages-v846-release';/);
 });
 
 function stringArray(name) {
@@ -45,4 +45,11 @@ test('Steuer- und PDF-Module werden lokal ausgeliefert', async () => {
 test('v8.45-UI-Modul bleibt Bestandteil des Offline-Bundles', () => {
   assert.ok(local.includes('./ui-consistency.js'));
   assert.ok(modules.includes('./ui-consistency.js'));
+});
+
+test('zentrale Versionsanzeige wird offline ausgeliefert', async () => {
+  assert.ok(local.includes('./version-info.js'));
+  assert.ok(modules.includes('./version-info.js'));
+  const version = await readFile(path.join(root, 'version-info.js'), 'utf8');
+  assert.match(version, /const APP_VERSION='8\.46';/);
 });
