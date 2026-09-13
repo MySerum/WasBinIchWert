@@ -1,6 +1,9 @@
 {
   "private": true,
   "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  },
   "dependencies": {
     "lohnsteuerrechner": "1.0.7",
     "pdf-lib": "1.17.1"
