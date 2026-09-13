@@ -5,10 +5,10 @@
   style.id='wiwUiConsistencyStyles';
   style.textContent=`
     /* Aktionspaare: beide Buttons immer exakt gleich hoch. */
-    .result-export-actions,.salary-actions,.neg-actions{
+    .result-export-actions,.salary-actions,.neg-actions,.offline-actions{
       align-items:stretch;
     }
-    .result-export-actions>button,.salary-actions>button,.neg-actions>button{
+    .result-export-actions>button,.salary-actions>button,.neg-actions>button,.offline-actions>button{
       box-sizing:border-box;
       height:56px;
       min-height:56px;
@@ -73,7 +73,7 @@
     }
 
     @media(max-width:390px){
-      .result-export-actions>button,.salary-actions>button,.neg-actions>button{
+      .result-export-actions>button,.salary-actions>button,.neg-actions>button,.offline-actions>button{
         height:54px;
         min-height:54px;
       }
