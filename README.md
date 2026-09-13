@@ -26,6 +26,10 @@ Der aktuelle Funktionsstand steht im [Änderungsprotokoll](CHANGELOG.md). Vor ei
 stabilen Veröffentlichung wird die [Freigabe-Checkliste](RELEASE-CHECKLIST.md)
 durchlaufen.
 
+Die in der App enthaltene Drittanbieter-Software und die zugehörigen
+Lizenzhinweise sind in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
+dokumentiert.
+
 Beabsichtigte Layoutänderungen können mit neuen Referenzbildern bestätigt werden:
 
 ```bash

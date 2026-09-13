@@ -17,5 +17,6 @@
 - [ ] PDF-Erstellung und Teilen auf Safari/macOS, Chrome, iPhone und Android testen.
 - [ ] PWA einmal online vorbereiten und anschließend ohne Verbindung starten.
 - [ ] Versionsnummer und Änderungsprotokoll kontrollieren.
+- [ ] Drittanbieter-Abhängigkeiten und `THIRD_PARTY_NOTICES.md` abgleichen.
 - [ ] Datenschutz, Impressum, Berechnungsquellen und Haftungshinweise prüfen.
 - [ ] Stabilen Git-Tag sowie ZIP-Backup erstellen.
