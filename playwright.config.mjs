@@ -12,9 +12,7 @@ export default defineConfig({
   expect: {
     toHaveScreenshot: {
       animations: 'disabled',
-      // Absorb small Linux runner font-rasterization differences while still
-      // detecting material changes to controls, spacing and component layout.
-      maxDiffPixelRatio: 0.03,
+      maxDiffPixelRatio: 0.01,
     },
   },
   projects: [

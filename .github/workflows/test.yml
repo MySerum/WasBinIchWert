@@ -29,3 +29,11 @@ jobs:
 
       - name: Run tests
         run: npm test
+
+      - name: Upload visual test failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-test-failures
+          path: test-results/
+          retention-days: 7
