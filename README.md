@@ -30,6 +30,13 @@ Die in der App enthaltene Drittanbieter-Software und die zugehörigen
 Lizenzhinweise sind in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)
 dokumentiert.
 
+## Lizenz
+
+Der eigenentwickelte Code und die eigenen Inhalte von WasBinIchWert sind
+proprietär und unterliegen der Regelung in [LICENSE](LICENSE). Alle Rechte sind
+vorbehalten. Für Drittanbieter-Komponenten gelten unabhängig davon deren
+jeweilige Open-Source-Lizenzen.
+
 Beabsichtigte Layoutänderungen können mit neuen Referenzbildern bestätigt werden:
 
 ```bash
