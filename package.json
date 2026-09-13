@@ -2,13 +2,16 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --test tests/*.test.mjs"
+    "test": "npm run test:unit && npm run test:ui",
+    "test:unit": "node --test tests/*.test.mjs",
+    "test:ui": "playwright test"
   },
   "dependencies": {
     "lohnsteuerrechner": "1.0.7",
     "pdf-lib": "1.17.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.55.0",
     "esbuild": "0.25.0"
   }
 }
