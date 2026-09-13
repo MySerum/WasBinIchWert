@@ -18,6 +18,8 @@
       align-items:center;
       justify-content:center;
       text-align:center;
+      font-size:14px!important;
+      font-weight:800;
       line-height:1.2;
     }
 
@@ -76,6 +78,7 @@
       .result-export-actions>button,.salary-actions>button,.neg-actions>button,.offline-actions>button{
         height:54px;
         min-height:54px;
+        font-size:13px!important;
       }
     }
   `;
