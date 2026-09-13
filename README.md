@@ -17,5 +17,13 @@ npm test
 
 Die Tests prüfen die lokale Steuerengine, die Sozialversicherungs-Referenzwerte,
 die Vollständigkeit des Offline-Caches sowie die Browserabläufe für Rechner,
-Gehaltsentwicklung und Gehaltsverhandlung. Nach der einmaligen Installation laufen
-sie vollständig gegen die lokalen App-Dateien.
+Gehaltsentwicklung und Gehaltsverhandlung. Visuelle Vergleichstests kontrollieren
+diese drei Kernbereiche zusätzlich auf Desktop-, iPhone- und Android-Abmessungen.
+Nach der einmaligen Installation laufen alle Prüfungen vollständig gegen die lokalen
+App-Dateien.
+
+Beabsichtigte Layoutänderungen können mit neuen Referenzbildern bestätigt werden:
+
+```bash
+npm run test:ui -- --update-snapshots
+```
