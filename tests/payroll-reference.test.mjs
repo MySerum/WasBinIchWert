@@ -38,3 +38,25 @@ test('lokale Steuerengine liefert steigende Lohnsteuer', () => {
   assert.ok(lower.LSTLZZ >= 0);
   assert.ok(higher.LSTLZZ > lower.LSTLZZ);
 });
+
+test('alle sechs Steuerklassen liefern endliche, nichtnegative Ergebnisse', () => {
+  for (let STKL = 1; STKL <= 6; STKL += 1) {
+    const result = calculate(2026, { LZZ: 2, RE4: 500000, STKL, KVZ: 2.9, PVZ: 1 });
+    assert.ok(Number.isFinite(result.LSTLZZ), `Steuerklasse ${STKL}`);
+    assert.ok(result.LSTLZZ >= 0, `Steuerklasse ${STKL}`);
+    assert.ok(Number.isFinite(result.SOLZLZZ), `Soli Steuerklasse ${STKL}`);
+  }
+});
+
+test('Null-Brutto erzeugt keine Lohnsteuer und keinen Solidaritätszuschlag', () => {
+  const result = calculate(2026, { LZZ: 2, RE4: 0, STKL: 1, KVZ: 2.9, PVZ: 1 });
+  assert.equal(result.LSTLZZ, 0);
+  assert.equal(result.SOLZLZZ, 0);
+});
+
+test('Kinderfreibetrag erhöht die Lohnsteuer nicht', () => {
+  const base = { LZZ: 2, RE4: 500000, STKL: 1, KVZ: 2.9, PVZ: 0 };
+  const withoutAllowance = calculate(2026, { ...base, ZKF: 0 });
+  const withAllowance = calculate(2026, { ...base, ZKF: 2 });
+  assert.ok(withAllowance.LSTLZZ <= withoutAllowance.LSTLZZ);
+});

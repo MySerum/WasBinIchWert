@@ -8,6 +8,10 @@ import path from 'node:path';
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const worker = await readFile(path.join(root, 'service-worker.js'), 'utf8');
 
+test('v8.46 verwendet einen neuen Offline-Cache', () => {
+  assert.match(worker, /const CACHE='wasbinichwert-pages-v846';/);
+});
+
 function stringArray(name) {
   const match = worker.match(new RegExp(`const ${name}=(\\[[^;]+\\]);`));
   assert.ok(match, `${name} fehlt im Service Worker`);
