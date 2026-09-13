@@ -8,8 +8,12 @@ export default defineConfig({
   use: {
     baseURL: 'http://127.0.0.1:4173',
     trace: 'retain-on-failure',
-    ...devices['Desktop Chrome'],
   },
+  projects: [
+    { name: 'desktop-chromium', use: { ...devices['Desktop Chrome'] } },
+    { name: 'mobile-iphone', use: { ...devices['iPhone 13'], browserName: 'chromium' } },
+    { name: 'mobile-android', use: { ...devices['Pixel 5'] } },
+  ],
   webServer: {
     command: 'node tests/static-server.mjs',
     url: 'http://127.0.0.1:4173',
